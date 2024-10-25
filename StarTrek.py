@@ -89,7 +89,6 @@ def display_status():
 		for j in ship[i].keys():
 			print(f"{j}: {ship[i][j]}")
 	
-
 def get_user_action(): 
 	while True:
 		try:
@@ -110,11 +109,24 @@ def run_mission():
 		case "Diplomacy":
 			print("You are communicating with a different race.")
 		case "Combat":
-			print("")
+			print("You are attacked as you continue your journey.")
+			# Combat as some kind of minigame? using while loop
 		case "Rescue":
 			print("You are required to rescue someone who is stranded.")
 		case "Scientific Research":
-			print("You are doing some scientific research on gthe ship.")
+			print("You are doing some scientific research on the ship.")
+			randomadvancement = random.choice(list(ship["systems"].keys()))
+			print(f"You have decided to research how to improve the ship further to ensure that your journey continues smoothly in the area of the ships {randomadvancement}.")
+			numberofsciencestaff = 0
+			for _ in ship["crew"]:
+				if _.value() == "Sciences":
+					numberofsciencestaff += 1
+			improvement = (numberofsciencestaff * 0.5) * 20
+			ship["systems"][randomadvancement] += improvement
+
+			print("You feel fulfilled with the improvements that you have made to the ship")
+			scoreadded += improvement * 5
+
 	# Return the score earned from the mission 
 	return scoreadded
 
@@ -140,21 +152,18 @@ def add_crew_member():
 	
 	ship["crew"][crewname] = crewdivision
 	
-
-
 def handle_random_event():
 # TODO: Implement random events that can occur during the simulation
 	randomeventid = random.randint(1,10)
+	tries = 5
+	inputa = ""
 	match randomeventid:
 		case 1:
-			tries = 5
 			print("You encounter an asteroid that is on track to collide with the ship. You could attempt to maneuver around it, attack it with a torpedo or engage your shields.")
 			validresponses = ["maneuver", "torpedo", "shields"]
-			inputa = ""
 			while inputa not in validresponses and tries > 0:
 				inputa = input("What do you do?").lower().strip()
 				tries -= 1
-			
 			match inputa:
 				case "maneuver":
 					print("You steer around the obstacle, but it requires you to utilise a lot of your engine fuel to quickly evade it.")
@@ -170,7 +179,46 @@ def handle_random_event():
 					print("You could not make a decision in time to avoid the obstacle and so the ship becomes damaged.")
 					ship["systems"]["engines"] -= 25
 					ship["systems"]["sensors"] -= 20
-
+		case 2:
+			print("You encounter a strange reading on one of the sensors and notice that it seems to be coming from a nearby planet. You understand that investigating it could be dangerous and sidetrack you, but could also give you resources to continue your journey.")
+			validresponses = ["y","n"]
+			while inputa not in validresponses and tries > 0:
+				inputa = input("Would you like to investigate it? y/n")
+				tries -= 1
+			randomoutcome = random.randint(1,2)
+			match inputa:
+				case "y":
+					print("You decide to investigate.")
+					use_resource("energy", 50)
+					if randomoutcome == 1:
+						print("You manage to salvage a lot of materials and use them to repair your ship from some of its damage and even reinforce some of the systems.")
+						ship["systems"]["shields"] += 30
+						ship["systems"]["weapons"] += 25
+						ship["systems"]["engines"] += 25
+					else:
+						print("You do not manage to find anything that is useful, but your ship was damaged slightly from the landing.")
+						ship["systems"]["engines"] -= 20
+				case "n":
+					print("You decide not to investigate the reading, it could be something that was a waste of time.")
+				case _:
+					print("You were uncertain of whether the reading was worth the risk of investigating, but time had already made its decision before you.")
+		case 3:
+			print("You encounter another ship floating in the expanse of space next to yours. You notice that one of the crew members of the other ship is preparing to enter your ship as it slows.")
+			print("You can leave the encounter, negotiate with the ")
+		case 4:
+			print("You encounter ")
+		case 5:
+			print()
+		case 6:
+			print()
+		case 7:
+			print()
+		case 8:
+			print()
+		case 9:
+			print()
+		case _:
+			print()
 
 def use_resource(resource, amount):
 	if  ship["resources"][resource] >= amount:
@@ -181,7 +229,7 @@ def use_resource(resource, amount):
 def replenish_resources(): 
 	if ship["resources"]["torpedos"] < 10:
 		ship["resources"]["torpedos"] = 10
-	
+
 	if ship["resources"]["energy"] > 800:
 		ship["resources"]["energy"] = 1000
 	else:
